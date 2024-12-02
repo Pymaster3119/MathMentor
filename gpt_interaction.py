@@ -31,9 +31,8 @@ class function:
 
 
 #Functions based on https://platform.openai.com/docs/guides/function-calling
-def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt = "", image_fname = None, messages = None, functions = None, isfunctioncall = False, returnmessages = False):
+def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt ="", messages = None, functions = None, isfunctioncall = False, returnmessages = False):
     global client
-
     #Build messages list
     if messages == None or len(messages) == 0:
         messages = [{"role": "system", "content": system_text}]
@@ -44,23 +43,8 @@ def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt = "", ima
                 messages.remove(i)
         messages.insert(0, {"role": "system", "content": system_text})
 
-    #Add user prompt, with image if applicable
-    if image_fname != None and not isfunctioncall:
-        with open(image_fname, "rb") as image_file:
-            base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-        messages.append({
-            "role": "user",
-            "content": [
-                {"type": "text", "text": user_prompt},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{base64_image}"
-                    }
-                },
-            ]
-        })
-    elif not isfunctioncall:
+    #Add user prompt
+    if not isfunctioncall:
         messages.append({"role":"user","content":user_prompt})
 
     #Assemble functions if needed
@@ -112,28 +96,25 @@ def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt = "", ima
                     args [j["name"]] = arguments.get(j["name"])
                 output = i.callback(**args)
                 args[i.outputname] = output
+                assistant_message = {
+                    "role": "assistant",
+                    "tool_calls":[{
+                        "id":response.choices[0].message.tool_calls[0].id,
+                        "type":"function",
+                        "function": {
+                            "arguments": response.choices[0].message.tool_calls[0].function.arguments,
+                            "name":response.choices[0].message.tool_calls[0].function.name
+                        }
+                    }]
+                }
                 function_call_result_message = {
                     "role": "tool",
                     "content": json.dumps(args),
                     "tool_call_id": response.choices[0].message.tool_calls[0].id
-                }      
+                }
         if not functionidentified:
             raise Exception("Smth went wrong. Check ur functions sir")
-        messages.append(response.choices[0].message)
+        messages.append(assistant_message)
         messages.append(function_call_result_message)
-        if output == "Saved Image":
-            with open("static/result.png", "rb") as image_file:
-                base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-            messages.append({
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/png;base64,{base64_image}"
-                        }
-                    },
-                ]
-            })
-        return run_query(gpt_model, system_text, user_prompt, image_fname, messages, functions, False)
+        return run_query(gpt_model, system_text, user_prompt, messages, functions, True)
 
