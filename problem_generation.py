@@ -27,7 +27,7 @@ multiple_choice_function = gpt_interaction.function(
         {"name": "answer_d", "type": "string", "description": "The last answer choice (option D)"}
     ],
     callback=multiple_choice,
-    outputname="answer"
+    outputname="User Answer"
 )
 
 #Word problems
@@ -46,18 +46,16 @@ word_problem_function = gpt_interaction.function(
     outputname="User Answer"
 )
 
-
 #Create problems
 correct = 0
 
 messages = []
 def create_question(prompt):
     global messages, correct
-    result = gpt_interaction.run_query(system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
+    result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
     if "orrect" in result:
         correct += 1
     #TODO: Make the UI
-    print(result)
     work = re.findall(r"'''work(.*?)'''", result, re.DOTALL)
     print(work)
 
