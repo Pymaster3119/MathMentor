@@ -1,4 +1,5 @@
 import gpt_interaction
+import re
 
 system_text = "You are an AI agent made to create both multiple choice questions and word problems for the given subject. In order to create questions, call the 'multiple_choice' and 'word problem' functions. When the user gives you the answer for a problem you have created, make sure to check the problem. In order to check the problem, make sure to show your work, being thourough and providing explanations for your answers. Encase your work in '''work ''' characters. At the end, provide the correct answer and either 'correct' or 'incorrect'."
 
@@ -40,7 +41,14 @@ word_problem_function = gpt_interaction.function(
 
 
 #Create problems
+correct = 0
+
 messages = []
 def create_question(prompt):
     global messages
-    gpt_interaction.run_query(system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
+    result = gpt_interaction.run_query(system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
+    if "orrect" in result:
+        correct += 1
+    #TODO: Make the UI
+    work = re.match("'''work(.*?)'''",result)[0]
+    print(work)
