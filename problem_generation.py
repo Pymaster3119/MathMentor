@@ -1,7 +1,8 @@
 import gpt_interaction
 import re
 
-system_text = "You are an AI agent made to create both multiple choice questions and word problems for the given subject. In order to create questions, call the 'multiple_choice' and 'word problem' functions. When the user gives you the answer for a problem you have created, make sure to check the problem. In order to check the problem, make sure to show your work, being thourough and providing explanations for your answers. Encase your work in '''work ''' characters. At the end, provide the correct answer and either 'correct' or 'incorrect'."
+with open("problem_generator_system_text.txt", "r") as txt:
+    system_text = txt.read()
 
 #Multiple Choice
 def multiple_choice(question, answer_a, answer_b, answer_c, answer_d):
@@ -42,7 +43,7 @@ word_problem_function = gpt_interaction.function(
     description="The function used to create a word problem", 
     params=[{"name": "question", "type": "string", "description": "The question asked"}],
     callback=word_problem,
-    outputname="answer"
+    outputname="User Answer"
 )
 
 
@@ -60,4 +61,4 @@ def create_question(prompt):
     work = re.findall(r"'''work(.*?)'''", result, re.DOTALL)
     print(work)
 
-create_question("Generate me a test for AP Precalculus, checking your work as you go")
+create_question("AP Precalculus")
