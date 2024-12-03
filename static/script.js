@@ -1,5 +1,4 @@
 //Update the subject when asked
-
 document.getElementById("submitButton").addEventListener("click", () => {
     const subjectval = document.getElementById("subject").value;
 
@@ -15,3 +14,13 @@ document.getElementById("submitButton").addEventListener("click", () => {
         console.log(response.json());
     });
 });
+
+//Update the questions
+async function fetchQuestion() {
+    const response = await fetch('/question.txt');
+    const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
+
+    document.getElementById('question').innerHTML = text;
+}
+
+setInterval(fetchQuestion, 200);

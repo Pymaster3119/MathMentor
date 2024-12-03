@@ -2,6 +2,11 @@
 <html>
     <head>
         <title>MathMentor</title>
+        <style>
+            .question {
+                white-space: pre-wrap;
+            }
+        </style>
     </head>
     <body>
         <h1>Math Mentor</h1>
@@ -9,6 +14,7 @@
             <label for="subject">Subject:</label>
             <input type="text" id="subject" name="subject" placeholder="Enter subject here">
             <button id="submitButton">Submit</button>
+            <div id="question">Question will come here...</div>
             <script src="{{ url_for('static', filename='script.js') }}"></script>
     </body>
 </html>

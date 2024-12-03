@@ -1,19 +1,22 @@
 import gpt_interaction
 import re
+import json
+import time
 
 with open("problem_generator_system_text.txt", "r") as txt:
     system_text = txt.read()
 
+answer = None
+
 #Multiple Choice
 def multiple_choice(question, answer_a, answer_b, answer_c, answer_d):
-    print("----------------------------------")
-    print(f"question: {question}")
-    print(f"a. {answer_a}")
-    print(f"b. {answer_b}")
-    print(f"c. {answer_c}")
-    print(f"d. {answer_d}")
-    answer = input("Answer:")
-    print("----------------------------------")
+    global answer
+    with open("question.txt", "w") as txt:
+        txt.write(question + "<br>")
+        txt.write(f"a. {answer_a}<br>b. {answer_b}<br>c. {answer_c}<br>d. {answer_d}")
+    
+    while answer == None:
+        time.sleep(0.001)
     return answer
 
 multiple_choice_function = gpt_interaction.function(
@@ -32,10 +35,12 @@ multiple_choice_function = gpt_interaction.function(
 
 #Word problems
 def word_problem(question):
-    print("----------------------------------")
-    print(f"question: {question}")
-    answer = input("Answer:")
-    print("----------------------------------")
+    global answer
+    with open("question.txt", "w") as txt:
+        txt.write(question + "<br>")
+    
+    while answer == None:
+        time.sleep(0.001)
     return answer
 
 word_problem_function = gpt_interaction.function(
@@ -53,10 +58,13 @@ messages = []
 def create_question(prompt):
     global messages, correct
     result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
+    print(result)
     if "orrect" in result:
         correct += 1
     #TODO: Make the UI
-    work = re.findall(r"'''work(.*?)'''", result, re.DOTALL)
+    work = re.findall(r"```work(.*?)```", result, re.DOTALL)[0]
     print(work)
-
-create_question("AP Precalculus")
+    with open("problem_result.json", "w") as file:
+        json.dump(
+            {"result":"correct" if correct else "incorrect", "work":work},
+            file, indent = 4)

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+import problem_generation
 
 app = Flask(__name__)
 
@@ -11,9 +12,15 @@ def create_test():
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
-    question = data['subject']
-    print(question)
+    subject = data['subject']
+    problem_generation.create_question(subject)
     return jsonify({'message':'Recieved well'}), 200
+
+@app.route('/question.txt', methods=['GET'])
+def get_question():
+    with open('question.txt', 'r') as txt:
+        content = txt.read()
+    return content, 200
 
 
 if __name__ == "__main__":
