@@ -22,6 +22,15 @@ def get_question():
         content = txt.read()
     return content, 200
 
+@app.route("/answer", methods=['Post'])
+def answer_question():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error":"Invalid input"}), 400
+    answer = data['answer']
+    problem_generation.answer = answer
+    return jsonify({'message':'Answer posted'}), 200
+
 
 if __name__ == "__main__":
     app.run()

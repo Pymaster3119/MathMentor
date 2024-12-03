@@ -8,17 +8,17 @@ with open("problem_generator_system_text.txt", "r") as txt:
 
 answer = None
 
+
 #Multiple Choice
 def multiple_choice(question, answer_a, answer_b, answer_c, answer_d):
     global answer
     with open("question.txt", "w") as txt:
-        txt.write(question + "<br>")
+        txt.write(question + "<br><br>")
         txt.write(f"a. {answer_a}<br>b. {answer_b}<br>c. {answer_c}<br>d. {answer_d}")
     
     while answer == None:
         time.sleep(0.001)
     return answer
-
 multiple_choice_function = gpt_interaction.function(
     name="multiple_choice", 
     description="The function used to create a multiple choice question", 
@@ -37,7 +37,7 @@ multiple_choice_function = gpt_interaction.function(
 def word_problem(question):
     global answer
     with open("question.txt", "w") as txt:
-        txt.write(question + "<br>")
+        txt.write(question)
     
     while answer == None:
         time.sleep(0.001)

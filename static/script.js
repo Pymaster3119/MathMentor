@@ -24,3 +24,20 @@ async function fetchQuestion() {
 }
 
 setInterval(fetchQuestion, 200);
+
+//Update the answer when asked
+document.getElementById("answerButton").addEventListener("click", () => {
+    const answerval = document.getElementById("answer").value;
+
+    fetch("/answer", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({answer:answerval})
+    })
+    .then(response => {
+        console.log("Result was " + (response.ok ? "okay": "not okay"));
+        console.log(response.json());
+    });
+})

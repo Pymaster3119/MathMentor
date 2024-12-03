@@ -1,1 +1,1 @@
-What is the limit of the function f(x) = (2x^2 - 3x + 1)/(x - 1) as x approaches 1?<br>a. 1<br>b. 2<br>c. 3<br>d. The limit does not exist
+What is the limit of the function f(x) = (2x^2 - 3x + 1)/(x - 1) as x approaches 1?<br><br>a. 1<br>b. 2<br>c. 3<br>d. Does not exist

@@ -1,0 +1,4 @@
+{
+    "result": "correct",
+    "work": "\n1. First, substitute \\( x = 1 \\) into the function to check if the limit can be directly evaluated:\n   \\[\n   f(1) = \\frac{2(1)^2 - 3(1) + 1}{1 - 1} = \\frac{2 - 3 + 1}{0} = \\frac{0}{0}\n   \\]\n   This results in an indeterminate form, so we need to simplify the expression.\n\n2. Factor the numerator:\n   \\[\n   2x^2 - 3x + 1 = (2x - 1)(x - 1)\n   \\]\n\n3. Rewrite the function:\n   \\[\n   f(x) = \\frac{(2x - 1)(x - 1)}{x - 1}\n   \\]\n\n4. Cancel the common factor \\( (x - 1) \\):\n   \\[\n   f(x) = 2x - 1\n   \\]\n\n5. Now, evaluate the limit as \\( x \\) approaches 1:\n   \\[\n   \\lim_{x \\to 1} (2x - 1) = 2(1) - 1 = 1\n   \\]\n"
+}
