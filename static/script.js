@@ -79,6 +79,21 @@ async function fetchWork() {
 
 setInterval(fetchWork, 200);
 
+//Next Question button
+document.getElementById("nextButton").addEventListener("click", () => {
+    const subjectval = document.getElementById("subject").value;
+
+    fetch("/api", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({subject:subjectval})
+    })
+    .then(response => {
+    });
+});
+
 //Deal with sliddes
 const slideIds = ["subject-slide", "question-answer-slide", "correctness-slide"];
 

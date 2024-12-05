@@ -1,1 +1,1 @@
-What is the limit of the function f(x) = (2x^2 - 3x + 1)/(x - 1) as x approaches 1?<br><br>a. Infinity<br>b. -Infinity<br>c. 1<br>d. Does not exist
+What is the equation of a line with a slope of 2 and a y-intercept of -3?<br><br>a. y = 2x - 3<br>b. y = -2x + 3<br>c. y = 3x - 2<br>d. y = 2x + 3
