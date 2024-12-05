@@ -1,3 +1,10 @@
+//Latex
+function processMath() {
+    if (window.MathJax && MathJax.typeset) {
+        MathJax.typeset(); 
+    }
+}
+
 //Update the subject when asked
 document.getElementById("submitButton").addEventListener("click", () => {
     const subjectval = document.getElementById("subject").value;
@@ -21,6 +28,7 @@ async function fetchQuestion() {
     const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
 
     document.getElementById('question').innerHTML = text;
+    processMath();
 }
 
 setInterval(fetchQuestion, 200);
@@ -48,6 +56,7 @@ async function fetchCorrectness() {
     const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
     console.log(text)
     document.getElementById('correctness').innerHTML = text;
+    processMath();
 }
 
 setInterval(fetchCorrectness, 200);
@@ -55,8 +64,8 @@ setInterval(fetchCorrectness, 200);
 async function fetchWork() {
     const response = await fetch('/work.txt');
     const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
-    console.log(text)
     document.getElementById('work').innerHTML = text;
+    processMath();
 }
 
 setInterval(fetchWork, 200);

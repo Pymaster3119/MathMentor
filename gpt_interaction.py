@@ -60,14 +60,14 @@ def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt ="", mess
             response = client.chat.completions.create(
                 model=gpt_model,
                 messages=messages,
-                temperature=0,
+                temperature=0.7,
                 max_tokens=1000,
             )
         else:
             response = client.chat.completions.create(
                 model=gpt_model,
                 messages=messages,
-                temperature=0,
+                temperature=0.7,
                 max_tokens=1000,
                 tools= tools
             )
