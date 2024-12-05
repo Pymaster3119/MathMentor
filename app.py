@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import problem_generation
+import json
 
 app = Flask(__name__)
 
@@ -31,6 +32,22 @@ def answer_question():
     problem_generation.answer = answer
     return jsonify({'message':'Answer posted'}), 200
 
+#Error 999 means that the question has not been answered yet
+@app.route("/work.txt", methods=["GET"])
+def get_work():
+    if not problem_generation.answered:
+        return jsonify({"error":"document not created yet"}), 999
+    with open("problem_result.json", "r") as txt:
+        data = json.load(txt)
+        return data["work"], 200
+
+@app.route('/correct.txt')
+def get_correctness():
+    if not problem_generation.answered:
+        return jsonify({"error":"document not created yet"}), 999
+    with open("problem_result.json", "r") as txt:
+        data = json.load(txt)
+        return data["result"], 200
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=8080)

@@ -7,20 +7,22 @@ with open("problem_generator_system_text.txt", "r") as txt:
     system_text = txt.read()
 
 answer = None
-
-
+answered = False
 #Multiple Choice
 def multiple_choice(question, answer_a, answer_b, answer_c, answer_d):
-    global answer
+    global answer, answered
     with open("question.txt", "w") as txt:
         txt.write(question + "<br><br>")
         txt.write(f"a. {answer_a}<br>b. {answer_b}<br>c. {answer_c}<br>d. {answer_d}")
-    
+    answered = False
     while answer == None:
         time.sleep(0.001)
-    return answer
+    answerlocal = str(answer)
+    answer = None
+    answered = True
+    return answerlocal
 multiple_choice_function = gpt_interaction.function(
-    name="multiple_choice", 
+    name="multiple_choice",
     description="The function used to create a multiple choice question", 
     params=[
         {"name": "question", "type": "string", "description": "The question asked"},

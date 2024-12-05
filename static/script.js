@@ -41,3 +41,22 @@ document.getElementById("answerButton").addEventListener("click", () => {
         console.log(response.json());
     });
 })
+
+//Update the correctness and work
+async function fetchCorrectness() {
+    const response = await fetch('/correct.txt');
+    const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
+    console.log(text)
+    document.getElementById('correctness').innerHTML = text;
+}
+
+setInterval(fetchCorrectness, 200);
+
+async function fetchWork() {
+    const response = await fetch('/work.txt');
+    const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
+    console.log(text)
+    document.getElementById('work').innerHTML = text;
+}
+
+setInterval(fetchWork, 200);

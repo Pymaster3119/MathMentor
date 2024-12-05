@@ -2,11 +2,6 @@
 <html>
     <head>
         <title>MathMentor</title>
-        <style>
-            .question {
-                white-space: pre-wrap;
-            }
-        </style>
     </head>
     <body>
         <h1>Math Mentor</h1>
@@ -17,6 +12,8 @@
             <div id="question">Question will come here...</div>
             <input type="text" id="answer" name="answer" placeholder="Enter answer here">
             <button id="answerButton">Submit Answer!</button>
+            <p id="correctness"></p>
+            <div id="work">Work will come here...</div>
             <script src="{{ url_for('static', filename='script.js') }}"></script>
     </body>
 </html>
