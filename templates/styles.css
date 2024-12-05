@@ -1,0 +1,11 @@
+.footer{
+    display: ruby-base;
+    right: inherit;
+    left: 100%;
+    display: block;
+    empty-cells: show;
+    color: #000;
+    font: 1em sans-serif;
+    z-index: 0;
+    visibility: hidden;
+}

@@ -4,16 +4,21 @@ import json
 
 app = Flask(__name__)
 
+currentslide = 0
+
 @app.route('/')
 def index():
     return render_template("index.html")
 
 @app.route("/api", methods=["POST"])
 def create_test():
+    global currentslide
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     subject = data['subject']
+    print("Hjere")
+    currentslide=1
     problem_generation.create_question(subject)
     return jsonify({'message':'Recieved well'}), 200
 
@@ -23,8 +28,10 @@ def get_question():
         content = txt.read()
     return content, 200
 
-@app.route("/answer", methods=['Post'])
+@app.route("/answer", methods=['POST'])
 def answer_question():
+    global currentslide
+    currentslide = 2
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
@@ -36,7 +43,7 @@ def answer_question():
 @app.route("/work.txt", methods=["GET"])
 def get_work():
     if not problem_generation.answered:
-        return jsonify({"error":"document not created yet"}), 999
+        return "document not created yet", 200
     with open("problem_result.json", "r") as txt:
         data = json.load(txt)
         return data["work"], 200
@@ -44,10 +51,22 @@ def get_work():
 @app.route('/correct.txt')
 def get_correctness():
     if not problem_generation.answered:
-        return jsonify({"error":"document not created yet"}), 999
+        return jsonify({"error":"document not created yet"}), 200
     with open("problem_result.json", "r") as txt:
         data = json.load(txt)
         return data["result"], 200
+    
+@app.route('/next', methods=["POST"])
+def next():
+    global currentslide
+    currentslide=1
+    create_test()
+
+@app.route("/frame.txt", methods=["POST"])
+def returnframe():
+    global currentslide
+    print(currentslide)
+    return str(currentslide), 200
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

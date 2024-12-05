@@ -1,4 +1,4 @@
 {
     "result": "correct",
-    "work": "\nTo find the limit of the function \\( f(x) = 3x + 2 \\) as \\( x \\) approaches 4, we simply substitute 4 into the equation:\n\n\\[ f(4) = 3(4) + 2 = 12 + 2 = 14 \\]\n\nTherefore, the limit of the function as \\( x \\) approaches 4 is 14.\n"
+    "work": "\nThe function simplifies to \\( 2x - 1 \\) after canceling the common factor \\( x - 1 \\) from the numerator and the denominator.\nThe limit as \\( x \\) approaches 1 is \\( 2(1) - 1 = 1 \\).\n"
 }
