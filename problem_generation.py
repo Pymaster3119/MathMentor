@@ -59,7 +59,7 @@ messages = []
 def create_question(prompt):
     global answered
     global messages, correct
-    result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
+    result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=system_text, user_prompt=prompt,messages=messages, functions=[word_problem_function])
     print(result)
     if "orrect" in result:
         correct += 1
