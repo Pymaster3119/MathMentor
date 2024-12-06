@@ -1,4 +1,4 @@
 {
     "result": "correct",
-    "work": "\nTo find the limit of the function f(x) = (2x^2 - 3x + 5)/(x^2 - x) as x approaches 1, we first substitute x = 1 into the function:\n\nf(1) = (2(1)^2 - 3(1) + 5) / (1^2 - 1)\n     = (2 - 3 + 5) / (1 - 1)\n     = 4 / 0\n\nSince direct substitution leads to division by zero, we need to simplify the expression. Notice that both the numerator and the denominator can be factored:\n\nNumerator: 2x^2 - 3x + 5\nDenominator: x^2 - x = x(x - 1)\n\nHowever, the numerator does not factor in a manner that cancels with the denominator. Thus, we examine the limit as x approaches 1 by considering small values around 1. The function remains undefined at x = 1, and therefore we use L'H\u00f4pital's Rule:\n\nDifferentiating the numerator: 4x - 3\nDifferentiating the denominator: 2x - 1\n\nApplying L'H\u00f4pital's Rule:\nLimit as x -> 1 of (4x - 3)/(2x - 1)\n\nSubstitute x = 1:\n(4(1) - 3) / (2(1) - 1) = 1\n\nThe limit is 1.\n"
+    "work": "\nThe correct answer is A: 1.\n"
 }

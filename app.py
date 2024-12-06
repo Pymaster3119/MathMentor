@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import problem_generation
 import json
+import threading
 
 app = Flask(__name__)
 
@@ -68,5 +69,13 @@ def returnframe():
     print(currentslide)
     return str(currentslide), 200
 
+def moveonfromloading():
+    global currentslide
+    while True:
+        if currentslide == 2 and problem_generation.answered:
+            currentslide = 3
+
 if __name__ == "__main__":
+    threading.Thread(target=moveonfromloading, daemon=True).start()
     app.run(debug=True, port=8080)
+    

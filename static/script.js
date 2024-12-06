@@ -95,7 +95,7 @@ document.getElementById("nextButton").addEventListener("click", () => {
 });
 
 //Deal with sliddes
-const slideIds = ["subject-slide", "question-answer-slide", "correctness-slide"];
+const slideIds = ["subject-slide", "question-answer-slide", "checking-slide", "correctness-slide"];
 
 function showSlide(index) {
     slideIds.forEach((id, i) => {

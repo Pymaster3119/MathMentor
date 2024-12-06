@@ -19,7 +19,6 @@ def multiple_choice(question, answer_a, answer_b, answer_c, answer_d):
         time.sleep(0.001)
     answerlocal = str(answer)
     answer = None
-    answered = True
     return answerlocal
 multiple_choice_function = gpt_interaction.function(
     name="multiple_choice",
@@ -58,15 +57,16 @@ correct = 0
 
 messages = []
 def create_question(prompt):
+    global answered
     global messages, correct
     result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=system_text, user_prompt=prompt,messages=messages, functions=[multiple_choice_function, word_problem_function])
     print(result)
     if "orrect" in result:
         correct += 1
-    #TODO: Make the UI
     work = re.findall(r"```work(.*?)```", result, re.DOTALL)[0]
     print(work)
     with open("problem_result.json", "w") as file:
         json.dump(
             {"result":"correct" if correct else "incorrect", "work":work},
             file, indent = 4)
+        answered = True
