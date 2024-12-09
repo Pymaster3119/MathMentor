@@ -1,1 +1,1 @@
-What is the limit of the function f(x) = (2x^2 - 3x + 5) / (x^2 - x) as x approaches 1?<br><br>a. 1<br>b. 4<br>c. 5<br>d. 2
+A farmer wants to build a rectangular fence for his chickens. He has 120 meters of fencing material. What dimensions should the farmer use to enclose the maximum possible area?

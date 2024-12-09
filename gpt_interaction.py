@@ -31,7 +31,7 @@ class function:
 
 
 #Functions based on https://platform.openai.com/docs/guides/function-calling
-def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt ="", messages = None, functions = None, isfunctioncall = False, returnmessages = False):
+def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt ="", messages = None, functions = None, isfunctioncall = False, returnmessages = False, callGPTafterfunction = True):
     global client
     #Build messages list
     if messages == None or len(messages) == 0:
@@ -80,6 +80,7 @@ def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt ="", mess
     if assistant_response.choices[0].finish_reason != "function_call" and assistant_response.choices[0].finish_reason != "tool_calls":
         messages.append({"role":"assistant", "content":assistant_response.choices[0].message.content.strip()})
         if returnmessages:
+            print("Here")
             return (assistant_response.choices[0].message.content.strip(), messages)
         else:
             return assistant_response.choices[0].message.content.strip()
@@ -95,26 +96,30 @@ def run_query(gpt_model = "gpt-4o-mini", system_text = "", user_prompt ="", mess
                 for j in i.params:
                     args [j["name"]] = arguments.get(j["name"])
                 output = i.callback(**args)
-                args[i.outputname] = output
-                assistant_message = {
-                    "role": "assistant",
-                    "tool_calls":[{
-                        "id":response.choices[0].message.tool_calls[0].id,
-                        "type":"function",
-                        "function": {
-                            "arguments": response.choices[0].message.tool_calls[0].function.arguments,
-                            "name":response.choices[0].message.tool_calls[0].function.name
-                        }
-                    }]
-                }
-                function_call_result_message = {
-                    "role": "tool",
-                    "content": json.dumps(args),
-                    "tool_call_id": response.choices[0].message.tool_calls[0].id
-                }
+                if callGPTafterfunction:
+                    args[i.outputname] = output
+                    assistant_message = {
+                        "role": "assistant",
+                        "tool_calls":[{
+                            "id":response.choices[0].message.tool_calls[0].id,
+                            "type":"function",
+                            "function": {
+                                "arguments": response.choices[0].message.tool_calls[0].function.arguments,
+                                "name":response.choices[0].message.tool_calls[0].function.name
+                            }
+                        }]
+                    }
+                    function_call_result_message = {
+                        "role": "tool",
+                        "content": json.dumps(args),
+                        "tool_call_id": response.choices[0].message.tool_calls[0].id
+                    }
         if not functionidentified:
             raise Exception("Smth went wrong. Check ur functions sir")
-        messages.append(assistant_message)
-        messages.append(function_call_result_message)
-        return run_query(gpt_model, system_text, user_prompt, messages, functions, True)
+        if callGPTafterfunction:
+            messages.append(assistant_message)
+            messages.append(function_call_result_message)
+            return run_query(gpt_model, system_text, user_prompt, messages, functions, True, returnmessages= returnmessages)
+        else:
+            return False
 

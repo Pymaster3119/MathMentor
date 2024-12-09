@@ -2,43 +2,29 @@ import gpt_interaction
 import re
 import json
 import time
+import os
+from IPython.core.interactiveshell import InteractiveShell
+from IPython.utils.capture import capture_output
 
 with open("problem_generator_system_text.txt", "r") as txt:
-    system_text = txt.read()
+    generator_system_text = txt.read()
+
+with open("problem_checker_system_text.txt", "r") as txt:
+    checker_system_text = txt.read()
+
+with open("correctgpt_system_text.txt", "r") as txt:
+    correctgpt_system_text = txt.read()
 
 answer = None
 answered = False
-#Multiple Choice
-def multiple_choice(question, answer_a, answer_b, answer_c, answer_d):
-    global answer, answered
-    with open("question.txt", "w") as txt:
-        txt.write(question + "<br><br>")
-        txt.write(f"a. {answer_a}<br>b. {answer_b}<br>c. {answer_c}<br>d. {answer_d}")
-    answered = False
-    while answer == None:
-        time.sleep(0.001)
-    answerlocal = str(answer)
-    answer = None
-    return answerlocal
-multiple_choice_function = gpt_interaction.function(
-    name="multiple_choice",
-    description="The function used to create a multiple choice question", 
-    params=[
-        {"name": "question", "type": "string", "description": "The question asked"},
-        {"name": "answer_a", "type": "string", "description": "The first answer choice (option A)"},
-        {"name": "answer_b", "type": "string", "description": "The second answer choice (option B)"},
-        {"name": "answer_c", "type": "string", "description": "The third answer choice (option C)"},
-        {"name": "answer_d", "type": "string", "description": "The last answer choice (option D)"}
-    ],
-    callback=multiple_choice,
-    outputname="User Answer"
-)
+questiong = None
 
 #Word problems
 def word_problem(question):
-    global answer
+    global answer, questiong
     with open("question.txt", "w") as txt:
         txt.write(question)
+    questiong = question
     
     while answer == None:
         time.sleep(0.001)
@@ -52,21 +38,42 @@ word_problem_function = gpt_interaction.function(
     outputname="User Answer"
 )
 
-#Create problems
-correct = 0
+#Checker
+def check(code):
+    code.replace("\\n", "\n")
+    shell = InteractiveShell.instance()
+    with capture_output() as captured:
+        shell.run_cell(code)
+    output = captured.stdout.strip()
+    print(type(output))
+    return output
+checker_function = gpt_interaction.function(
+    name="python_eval", 
+    description="The function used to run code in python", 
+    params=[{"name": "code", "type": "string", "description": "The code to be run"}],
+    callback=check,
+    outputname="User Answer"
+)
 
-messages = []
+#Create problems
 def create_question(prompt):
-    global answered
-    global messages, correct
-    result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=system_text, user_prompt=prompt,messages=messages, functions=[word_problem_function])
-    print(result)
-    if "orrect" in result:
-        correct += 1
+    global answered, questiong
+    gpt_interaction.run_query(gpt_model="gpt-4o", system_text=generator_system_text, user_prompt=prompt,messages=[], functions=[word_problem_function], callGPTafterfunction=False)
+    while answer == None:
+        time.sleep(0.001)
+    checker_messages = []
+    _, checker_messages = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt=questiong, functions=[checker_function], returnmessages=True)
+    result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt="Great! Now, do the calculations and give me an answer", functions=[checker_function], returnmessages=False)
     work = re.findall(r"```work(.*?)```", result, re.DOTALL)[0]
+    correctanswer = re.findall(r"ANSWER: (.*?)", result, re.DOTALL)[0]
+
     print(work)
+
+    correctness = gpt_interaction.run_query(gpt_model="gpt-4o",system_text=correctgpt_system_text, user_prompt=f"answer1: {answer}\nanswer2: {correctanswer}")
+    print(f"answer1: {answer}\nanswer2: {correctanswer}")
+    print(correctness)
     with open("problem_result.json", "w") as file:
         json.dump(
-            {"result":"correct" if correct else "incorrect", "work":work},
+            {"result":correctness, "work":work},
             file, indent = 4)
         answered = True

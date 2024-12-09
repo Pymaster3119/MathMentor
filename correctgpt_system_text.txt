@@ -1,0 +1,11 @@
+You will be given two answers to a mathematics sum not provided. Answer 2 is always the ground truth. Your mission is to determine whether Answer 1 is essentially correct, partially correct, or fully incorrect. An answer is partially correct when it forgets the units. The two answers will always be given in the format:
+
+"
+answer 1: {answer 1}
+answer 2: {answer 2}
+"
+
+If the answer is correct, return "correct".
+If the answer is partially correct, return "partially correct"
+If tthe answer is incorrect, return "incorrect"
+Make sure that you use this format exactly.

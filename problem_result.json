@@ -1,4 +1,4 @@
 {
-    "result": "correct",
-    "work": "\nThe correct answer is A: 1.\n"
+    "result": "\"incorrect\"",
+    "work": "\nTo find the distance traveled by the car, we use the formula:\n\nDistance = Speed \u00d7 Time\n\nGiven that the speed of the car is 60 miles per hour and the time of travel is 2.5 hours, we can substitute these values into the formula:\n\nDistance = 60 miles/hour \u00d7 2.5 hours = 150 miles\n"
 }

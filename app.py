@@ -66,7 +66,6 @@ def next():
 @app.route("/frame.txt", methods=["POST"])
 def returnframe():
     global currentslide
-    print(currentslide)
     return str(currentslide), 200
 
 def moveonfromloading():
