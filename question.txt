@@ -1,1 +1,1 @@
-A farmer wants to build a rectangular fence for his chickens. He has 120 meters of fencing material. What dimensions should the farmer use to enclose the maximum possible area?
+A curve passes through the point (1, 2) and has the equation y = f(x) = (x^2 - 4)/(x - 2)^2. Find the derivative of f(x).

@@ -2,7 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import problem_generation
 import json
 import threading
-
+import logging
+import time
+log = logging.getLogger('werkzeug')
+log.disabled = True
 app = Flask(__name__)
 
 currentslide = 0
@@ -20,7 +23,7 @@ def create_test():
     subject = data['subject']
     print("Hjere")
     currentslide=1
-    problem_generation.create_question(subject)
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.")
     return jsonify({'message':'Recieved well'}), 200
 
 @app.route('/question.txt', methods=['GET'])
@@ -32,7 +35,7 @@ def get_question():
 @app.route("/answer", methods=['POST'])
 def answer_question():
     global currentslide
-    currentslide = 2
+    currentslide = 3
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
@@ -71,10 +74,13 @@ def returnframe():
 def moveonfromloading():
     global currentslide
     while True:
-        if currentslide == 2 and problem_generation.answered:
-            currentslide = 3
+        if currentslide == 1 and problem_generation.questiong:
+            currentslide = 2
+        if currentslide == 3 and problem_generation.answered:
+            currentslide = 4
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     threading.Thread(target=moveonfromloading, daemon=True).start()
-    app.run(debug=True, port=8080)
+    app.run(debug=False, port=8080)
     

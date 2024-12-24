@@ -10,6 +10,13 @@
             <h1 class="text-center mb-4">Math Mentor</h1>
             <p class="text-center mb-4">A project made by Aditya Anand</p>
 
+            <!--Generating-->
+            <div id="generating-slide">
+                <div class="mb-3">
+                    Give us time, we are generating your questions...
+                </div>
+            </div>
+
             <!--Subject Input-->
             <div class="alert alert-info" id="subject-slide">
                 <div class="mb-3">
@@ -44,7 +51,10 @@
             <div id="correctness-slide" class="alert alert-info">
                 <p id="correctness" class="text-center mb-4"></p>
                 <div id="work" class="alert alert-secondary" role="alert">Work will come here...</div>
-                <button id="nextButton" class="btn btn-success">Next Question</button>
+                <button id="sameButton" class="btn btn-success">Generate Similar Question</button>
+                <button id="diffButton" class="btn btn-danger">Generate Question with a Different Topic</button>
+                <button id="easyButton" class="btn btn-success">Generate Easier Question</button>
+                <button id="hardButton" class="btn btn-danger">Generate Harder Question</button>
             </div>
 
             <!--Scripts & Stuff-->

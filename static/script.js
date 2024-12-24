@@ -95,7 +95,7 @@ document.getElementById("nextButton").addEventListener("click", () => {
 });
 
 //Deal with sliddes
-const slideIds = ["subject-slide", "question-answer-slide", "checking-slide", "correctness-slide"];
+const slideIds = ["subject-slide", "generating-slide", "question-answer-slide", "checking-slide", "correctness-slide"];
 
 function showSlide(index) {
     slideIds.forEach((id, i) => {
@@ -129,3 +129,67 @@ function updateSlide() {
 
 showSlide(0);
 setInterval(updateSlide, 200);
+
+//Same topic button
+document.getElementById("sameButton").addEventListener("click", () => {
+    const subjectval = document.getElementById("subject").value;
+    const questionval = document.getElementById("question").value;
+
+    fetch("/sametopic", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({subject:subjectval, question:questionval})
+    })
+    .then(response => {
+    });
+});
+
+//Different topic button
+document.getElementById("diffButton").addEventListener("click", () => {
+    const subjectval = document.getElementById("subject").value;
+    const questionval = document.getElementById("question").value;
+
+    fetch("/differenttopic", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({subject:subjectval, question:questionval})
+    })
+    .then(response => {
+    });
+});
+
+//Harder question button
+document.getElementById("hardButton").addEventListener("click", () => {
+    const subjectval = document.getElementById("subject").value;
+    const questionval = document.getElementById("question").value;
+
+    fetch("/hardquestion", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({subject:subjectval, question:questionval})
+    })
+    .then(response => {
+    });
+});
+
+//Easy question button
+document.getElementById("easyButton").addEventListener("click", () => {
+    const subjectval = document.getElementById("subject").value;
+    const questionval = document.getElementById("question").value;
+
+    fetch("/easytopic", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({subject:subjectval, question:questionval})
+    })
+    .then(response => {
+    });
+});
