@@ -76,24 +76,21 @@ def create_question(prompt, previous_question=None, status=None):
 
     #Generate the question
     if previous_question == None or status == "different":
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = [executor.submit(llamainteraction.sendmsgs,generator_system_text, prompt)]
-        for future in concurrent.futures.as_completed(futures):
-            question = future.result()
+        print("Heheeheeere")
+        question = llamainteraction.sendmsgs(generator_system_text, prompt)
     else:
         if status == "similar":
             messages = [{"role": "system", "content": generator_system_text}, {"role": "user", "content": prompt}, {"role": "assistant", "content": previous_question}, {"role": "user", "content": "Give me a similar question"}]
         elif status == "easier":
             messages = [{"role": "system", "content": generator_system_text}, {"role": "user", "content": prompt}, {"role": "assistant", "content": previous_question}, {"role": "user", "content": "Give me an easier question"}]
-        else:
+        elif status == "harder":
             messages = [{"role": "system", "content": generator_system_text}, {"role": "user", "content": prompt}, {"role": "assistant", "content": previous_question}, {"role": "user", "content": "Give me a harder question"}]
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = [executor.submit(llamainteraction.send_msgs_history,messages)]
-        for future in concurrent.futures.as_completed(futures):
-            question = future.result()
+        question = llamainteraction.send_msgs_history(messages)
     word_problem(question)
     while answer == None:
         time.sleep(0.001)
+
+    #Check the answer
     checker_messages = []
     _, checker_messages = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt=questiong, functions=[checker_function, submit_function], returnmessages=True)
     result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt="Great! Now, do the calculations and give me an answer", functions=[checker_function, submit_function], returnmessages=False)

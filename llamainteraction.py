@@ -5,9 +5,8 @@ import time
 import os
 import json
 
-os.system("python3 LLamaInteraction/RunLlama.py")
-
 def sendmsgs(systemtext, chatprompt):
+    print("hehehehehehehehehre")
     with open("LLamaInteraction/SystemText", "w") as txt:
         txt.write(systemtext)
     with open("LLamaInteraction/Input", "w") as txt:
@@ -16,6 +15,9 @@ def sendmsgs(systemtext, chatprompt):
         with open("LLamaInteraction/Output", "r") as txt:
             output = txt.read()
         if output != "":
+            print("heheheheeeheeheeheeeereere")
+            with open("LLamaInteraction/Output", "w") as txt:
+                txt.write("")
             return output
 
 def send_msgs_history(messages):
@@ -25,4 +27,6 @@ def send_msgs_history(messages):
         with open("LLamaInteraction/Output", "r") as txt:
             output = txt.read()
         if output != "":
+            with open("LLamaInteraction/Output", "w") as txt:
+                txt.write("")
             return output

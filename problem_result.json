@@ -1,4 +1,0 @@
-{
-    "result": "correct",
-    "work": "We are given the function f(x) = (x^2 - 4)/(x - 2)^2 and need to find its derivative. We'll use the quotient rule for differentiation, which states that for a function f(x) = u(x)/v(x), the derivative f'(x) is given by (v*u' - u*v') / v^2.\n\nFirst, we identify u(x) = x^2 - 4 and v(x) = (x - 2)^2. We then compute the derivatives of these components:\n- The derivative of u(x) with respect to x is u'(x) = 2x.\n- The derivative of v(x) with respect to x is v'(x) = 2(x - 2).\n\nWe apply the quotient rule:\nf'(x) = [(x - 2)^2 * 2x - (x^2 - 4) * 2(x - 2)] / (x - 2)^4.\n\nAfter simplification, this expression is reduced to f'(x) = -4/(x^2 - 4x + 4).\n\nThus, the derivative of the function is given by f'(x) = -4/(x^2 - 4x + 4)."
-}

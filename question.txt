@@ -1,1 +1,1 @@
-A curve passes through the point (1, 2) and has the equation y = f(x) = (x^2 - 4)/(x - 2)^2. Find the derivative of f(x).
+Find the equation of the tangent line to the curve y = (2x^3 + 3x^2 - 4x + 1) / (x^2 + 1) at the point where x = 1.

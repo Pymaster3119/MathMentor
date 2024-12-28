@@ -43,7 +43,6 @@ def answer_question():
     problem_generation.answer = answer
     return jsonify({'message':'Answer posted'}), 200
 
-#Error 999 means that the question has not been answered yet
 @app.route("/work.txt", methods=["GET"])
 def get_work():
     if not problem_generation.answered:
@@ -60,11 +59,53 @@ def get_correctness():
         data = json.load(txt)
         return data["result"], 200
     
-@app.route('/next', methods=["POST"])
-def next():
+@app.route('/sametopic', methods=["POST"])
+def sametopic():
     global currentslide
+    data = request.get_json()
+    if not data:
+        return jsonify({"error":"Invalid input"}), 400
+    subject = data['subject']
+    previous_question = data['previous_question']
     currentslide=1
-    create_test()
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "similar")
+    return jsonify({'message':'Recieved well'}), 200
+
+@app.route('/differenttopic', methods=["POST"])
+def differenttopic():
+    global currentslide
+    data = request.get_json()
+    if not data:
+        return jsonify({"error":"Invalid input"}), 400
+    subject = data['subject']
+    previous_question = data['previous_question']
+    currentslide=1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "different")
+    return jsonify({'message':'Recieved well'}), 200    
+
+@app.route('/easyquestion', methods=["POST"])
+def easytopic():
+    global currentslide
+    data = request.get_json()
+    if not data:
+        return jsonify({"error":"Invalid input"}), 400
+    subject = data['subject']
+    previous_question = data['previous_question']
+    currentslide=1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "easier")
+    return jsonify({'message':'Recieved well'}), 200   
+
+@app.route('/hardquestion', methods=["POST"])
+def hardtopic():
+    global currentslide
+    data = request.get_json()
+    if not data:
+        return jsonify({"error":"Invalid input"}), 400
+    subject = data['subject']
+    previous_question = data['previous_question']
+    currentslide=1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "harder")
+    return jsonify({'message':'Recieved well'}), 200   
 
 @app.route("/frame.txt", methods=["POST"])
 def returnframe():

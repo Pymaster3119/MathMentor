@@ -1,6 +1,5 @@
 from transformers import pipeline
 import torch
-import re
 import time
 import os
 import json
@@ -11,24 +10,17 @@ model_id = "meta-llama/Llama-3.2-3B-Instruct"
 pipe = pipeline(
     "text-generation",
     model=model_id,
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     device_map="auto",
 )
-
 while True:
-    #Clear all files
-    with open("LLamaInteraction/Input", "w") as txt:
-        txt.write("")
-    with open("LLamaInteraction/SystemText", "w") as txt:
-        txt.write("")
-    with open("LLamaInteraction/Output", "w") as txt:
-        txt.write("")
-
     #Deal with single input/system text
-    with open("LLamaInteraction/Input", "r") as txt:
+    with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/Input", "r") as txt:
         input = txt.read()
     if input != "":
-        with open("LLamaInteraction/SystemText", "r") as txt:
+        print("Reading single input")
+        starttime = time.time()
+        with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/SystemText", "r") as txt:
             systemtext = txt.read()
         messages = [
             {"role": "system", "content": systemtext},
@@ -38,20 +30,32 @@ while True:
             messages,
             max_new_tokens=1024,
         )
-        endtime = time.time()
-        with open("LLamaInteraction/Output", "w") as txt:
+        with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/Output", "w") as txt:
             txt.write(outputs[0]["generated_text"][-1]["content"])
+        with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/Input", "w") as txt:
+            txt.write("")
+        with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/SystemText", "w") as txt:
+            txt.write("")
+        
+        endtime = time.time()
+        print("Time taken for a single input test: " + str(endtime - starttime))
 
     #Deal with the full history
-    with open("LLamaInteraction/FullHistory.json", "r") as txt:
+    with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/FullHistory.json", "r") as txt:
+        
+        starttime = time.time()
         history = txt.read()
         if history != "":
+            print("Reading full history")
             history = json.loads(history)
-        outputs = pipe(
-            messages,
-            max_new_tokens=1024,
-        )
-        with open("LLamaInteraction/Output", "w") as txt:
-            txt.write(outputs[0]["generated_text"][-1]["content"])
-
+            outputs = pipe(
+                history,
+                max_new_tokens=1024,
+            )
+            with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/Output", "w") as txt:
+                txt.write(outputs[0]["generated_text"][-1]["content"])
+            with open("/Users/aditya/Desktop/InProgress/MathMentor/LLamaInteraction/FullHistory.json", "w") as txt:
+                txt.write("")
+            endtime = time.time()
+            print("Time taken for a full history: " + str(endtime - starttime))
     time.sleep(0.1)

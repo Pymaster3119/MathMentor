@@ -29,7 +29,7 @@ async function fetchQuestion() {
     processMath();
 }
 
-setInterval(fetchQuestion, 200);
+setInterval(fetchQuestion, 500);
 
 //Update the answer when asked
 document.getElementById("answerButton").addEventListener("click", () => {
@@ -54,7 +54,7 @@ async function fetchCorrectness() {
     processMath();
 }
 
-setInterval(fetchCorrectness, 200);
+setInterval(fetchCorrectness, 500);
 
 async function fetchWork() {
     try {
@@ -77,22 +77,7 @@ async function fetchWork() {
     }
 }
 
-setInterval(fetchWork, 200);
-
-//Next Question button
-document.getElementById("nextButton").addEventListener("click", () => {
-    const subjectval = document.getElementById("subject").value;
-
-    fetch("/api", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({subject:subjectval})
-    })
-    .then(response => {
-    });
-});
+setInterval(fetchWork, 500);
 
 //Deal with sliddes
 const slideIds = ["subject-slide", "generating-slide", "question-answer-slide", "checking-slide", "correctness-slide"];
@@ -128,7 +113,7 @@ function updateSlide() {
 
 
 showSlide(0);
-setInterval(updateSlide, 200);
+setInterval(updateSlide, 500);
 
 //Same topic button
 document.getElementById("sameButton").addEventListener("click", () => {
@@ -183,7 +168,7 @@ document.getElementById("easyButton").addEventListener("click", () => {
     const subjectval = document.getElementById("subject").value;
     const questionval = document.getElementById("question").value;
 
-    fetch("/easytopic", {
+    fetch("/easyquestion", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
