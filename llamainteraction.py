@@ -5,7 +5,7 @@ import time
 import os
 import json
 
-def sendmsgs(systemtext, chatprompt):
+def sendmsgs(systemtext, chatprompt, return_history=False):
     print("hehehehehehehehehre")
     with open("LLamaInteraction/SystemText", "w") as txt:
         txt.write(systemtext)
@@ -18,7 +18,11 @@ def sendmsgs(systemtext, chatprompt):
             print("heheheheeeheeheeheeeereere")
             with open("LLamaInteraction/Output", "w") as txt:
                 txt.write("")
-            return output
+            if not return_history:
+                return output
+            else:
+                history = [{"role":"system", "content":systemtext}, {"role":"user", "content":chatprompt}, {"role":"assistant", "content":output}]
+                return (output, history)
 
 def send_msgs_history(messages):
     with open("LLamaInteraction/FullHistory.json", "w") as txt:

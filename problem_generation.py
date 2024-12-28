@@ -92,7 +92,44 @@ def create_question(prompt, previous_question=None, status=None):
 
     #Check the answer
     checker_messages = []
-    _, checker_messages = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt=questiong, functions=[checker_function, submit_function], returnmessages=True)
+    _, checker_messages = llamainteraction.sendmsgs(systemtext=checker_system_text, chatprompt=questiong, return_history=True)
+    #Deal with the functions
+    while True:
+        result = llamainteraction.send_msgs_history(checker_messages)
+        checker_messages.append({"role":"assistant", "content":result})
+
+        #Oh god, this is a mess
+        try:
+            result_json = json.loads(result)
+            try:
+                function_name = result_json["function_name"]
+                if function_name == "submit_answer":
+                    try:
+                        work = result_json["work"]
+                        try:
+                            correctanswer = result_json["correctanswer"]
+                            submit_function(work, correctanswer)
+                            break
+                        except:
+                            checker_messages.append({"role":"functions", "content":"Error: Correct answer parameter is missing"})
+                    except:
+                        checker_messages.append({"role":"functions", "content":"Error: Work parameter is missing"})
+                elif function_name == "python_eval":
+                    try:
+                        code = result_json["code"]
+                        try:
+                            checker_messages.append({"role":"functions", "content":checker_function(code)})
+                        except:
+                            checker_messages.append({"role":"functions", "content":"Error: Invalid code"})
+                    except:
+                        checker_messages.append({"role":"functions", "content":"Error: Code parameter is missing"})
+                else:
+                    checker_messages.append({"role":"functions", "content":"Error: Invalid function name"})
+            except:
+                checker_messages.append({"role":"functions", "content":"Error: Function name is missing"})
+        except:
+            checker_messages.append({"role":"functions", "content":"Error: Invalid JSON"})
+    
     result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt="Great! Now, do the calculations and give me an answer", functions=[checker_function, submit_function], returnmessages=False)
     work = workg
     correctanswer = correctanswerg
