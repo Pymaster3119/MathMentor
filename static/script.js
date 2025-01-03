@@ -1,3 +1,24 @@
+//Hashes
+const browserInfo = navigator.userAgent;
+const timeOfAccess = new Date().toISOString();
+const dataToHash = `${browserInfo}-${timeOfAccess}`;
+let userHash = '';
+
+async function generateHash(data) {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+// Generate the hash
+generateHash(dataToHash).then(hash => {
+    console.log('Hash:', hash);
+    userHash = hash;
+});
+
 //Latex
 function processMath() {
     if (window.MathJax && MathJax.typeset) {
@@ -14,7 +35,7 @@ document.getElementById("submitButton").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject:subjectval})
+        body: JSON.stringify({subject:subjectval, user_id: userHash})
     })
     .then(response => {
     });
@@ -22,7 +43,7 @@ document.getElementById("submitButton").addEventListener("click", () => {
 
 //Update the questions
 async function fetchQuestion() {
-    const response = await fetch('/question.txt');
+    const response = await fetch(`/question.txt?user_id=${userHash}`);
     const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
 
     document.getElementById('question').innerHTML = text;
@@ -40,7 +61,7 @@ document.getElementById("answerButton").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({answer:answerval})
+        body: JSON.stringify({answer:answerval, user_id: userHash})
     })
     .then(response => {
     });
@@ -48,7 +69,7 @@ document.getElementById("answerButton").addEventListener("click", () => {
 
 //Update the correctness and work
 async function fetchCorrectness() {
-    const response = await fetch('/correct.txt');
+    const response = await fetch(`/correct.txt?user_id=${userHash}`);
     const text = (await response.text()).replace(/<br\s*\/?>/gi, '\n').replace(/\n/g, '<br>');
     document.getElementById('correctness').innerHTML = text;
     processMath();
@@ -58,7 +79,7 @@ setInterval(fetchCorrectness, 500);
 
 async function fetchWork() {
     try {
-        const response = await fetch('/work.txt');
+        const response = await fetch(`/work.txt?user_id=${userHash}`);
     
         if (!response.ok) {
             return;
@@ -79,7 +100,7 @@ async function fetchWork() {
 
 setInterval(fetchWork, 500);
 
-//Deal with sliddes
+//Deal with slides
 const slideIds = ["subject-slide", "generating-slide", "question-answer-slide", "checking-slide", "correctness-slide"];
 
 function showSlide(index) {
@@ -94,7 +115,7 @@ function showSlide(index) {
 }
 
 function updateSlide() {
-    fetch('/frame.txt', {
+    fetch(`/frame.txt?user_id=${userHash}`, {
         method: 'POST',
     })
     .then(response => response.text())
@@ -111,7 +132,6 @@ function updateSlide() {
     });
 }
 
-
 showSlide(0);
 setInterval(updateSlide, 500);
 
@@ -125,7 +145,7 @@ document.getElementById("sameButton").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject:subjectval, question:questionval})
+        body: JSON.stringify({subject:subjectval, previous_question:questionval, user_id: userHash})
     })
     .then(response => {
     });
@@ -141,7 +161,7 @@ document.getElementById("diffButton").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject:subjectval, question:questionval})
+        body: JSON.stringify({subject:subjectval, previous_question:questionval, user_id: userHash})
     })
     .then(response => {
     });
@@ -157,7 +177,7 @@ document.getElementById("hardButton").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject:subjectval, question:questionval})
+        body: JSON.stringify({subject:subjectval, previous_question:questionval, user_id: userHash})
     })
     .then(response => {
     });
@@ -173,7 +193,7 @@ document.getElementById("easyButton").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject:subjectval, question:questionval})
+        body: JSON.stringify({subject:subjectval, previous_question:questionval, user_id: userHash})
     })
     .then(response => {
     });

@@ -24,7 +24,7 @@ while True:
             # Deal with single input/system text
             with open(f"{folder}/Input", "r") as txt:
                 input = txt.read()
-            with open(f"{folder}SystemText", "r") as txt:
+            with open(f"{folder}/SystemText", "r") as txt:
                 systemtext = txt.read()
             if input != "":
                 print("Reading single input")
@@ -64,7 +64,7 @@ while True:
                 print("Time taken for a single input: " + str(endtime - starttime))
 
             # Deal with the full history
-            with open(f"{folder}FullHistory.json", "r") as txt:
+            with open(f"{folder}/FullHistory.json", "r") as txt:
                 history = txt.read()
             if history != "":
                 print("Reading full history")

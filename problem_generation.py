@@ -1,13 +1,9 @@
-
 import gpt_interaction
-import re
 import json
 import time
-import os
 from IPython.core.interactiveshell import InteractiveShell
 from IPython.utils.capture import capture_output
 import llamainteraction
-import concurrent.futures
 
 with open("problem_generator_system_text.txt", "r") as txt:
     generator_system_text = txt.read()
@@ -18,20 +14,8 @@ with open("problem_checker_system_text.txt", "r") as txt:
 with open("correctgpt_system_text.txt", "r") as txt:
     correctgpt_system_text = txt.read()
 
-answer = None
-answered = False
-questiong = None
-
-#Word problems
-def word_problem(question):
-    global answer, questiong
-    with open("question.txt", "w") as txt:
-        txt.write(question)
-    questiong = question
-    
-    while answer == None:
-        time.sleep(0.001)
-    return answer
+user_answers = {}
+user_answered = {}
 
 #Checker
 def check(code):
@@ -50,34 +34,21 @@ checker_function = gpt_interaction.function(
     outputname="User Answer"
 )
 
-#Submit Work
-correctanswerg = None
-workg = None
-def submitwork(correctanswer, work):
-    global correctanswerg, workg
-    correctanswerg = correctanswer
-    workg = work
-submit_function = gpt_interaction.function(
-    name="submit_answer", 
-    description="The function used to submit your final answer and work", 
-    params=[{"name": "work", "type": "string", "description": "The work leading up to your answer, neatly summarized"}, {"name": "correctanswer", "type": "string", "description": "The correct answer"}],
-    callback=submitwork,
-    outputname="User Answer"
-)
+def set_answer(user_id, answer):
+    user_answers[user_id] = answer
 
 #Create problems
-def create_question(prompt, previous_question=None, status=None):
-    with open("question.txt", "w") as txt:
+def create_question(prompt, previous_question=None, status=None, user_id=None):
+    with open(f"{user_id}_question.txt", "w") as txt:
         txt.write("")
-    with open("problem_result.json", "w") as txt:
+    with open(f"{user_id}_problem_result.json", "w") as txt:
         txt.write("")
-    global answered, questiong
-    questiong = None
+    user_answered[user_id] = False
 
     #Generate the question
+    print(previous_question)
     if previous_question == None or status == "different":
-        print("Heheeheeere")
-        question = llamainteraction.sendmsgs(generator_system_text, prompt)
+        question = llamainteraction.sendmsgs(generator_system_text, prompt, user_id=user_id)
     else:
         if status == "similar":
             messages = [{"role": "system", "content": generator_system_text}, {"role": "user", "content": prompt}, {"role": "assistant", "content": previous_question}, {"role": "user", "content": "Give me a similar question"}]
@@ -85,19 +56,25 @@ def create_question(prompt, previous_question=None, status=None):
             messages = [{"role": "system", "content": generator_system_text}, {"role": "user", "content": prompt}, {"role": "assistant", "content": previous_question}, {"role": "user", "content": "Give me an easier question"}]
         elif status == "harder":
             messages = [{"role": "system", "content": generator_system_text}, {"role": "user", "content": prompt}, {"role": "assistant", "content": previous_question}, {"role": "user", "content": "Give me a harder question"}]
-        question = llamainteraction.send_msgs_history(messages)
-    word_problem(question)
-    while answer == None:
+        question = llamainteraction.send_msgs_history(messages, user_id=user_id)
+    
+    with open(f"{user_id}_question.txt", "w") as txt:
+        txt.write(question)
+    
+    while user_id not in user_answers:
         time.sleep(0.001)
+
+    answer = user_answers[user_id]
 
     #Check the answer
     checker_messages = []
-    _, checker_messages = llamainteraction.sendmsgs(systemtext=checker_system_text, chatprompt=questiong, return_history=True)
+    _, checker_messages = llamainteraction.sendmsgs(systemtext=checker_system_text, chatprompt=question, return_history=True, user_id=user_id)
+    print(checker_messages)
     #Deal with the functions
     while True:
-        result = llamainteraction.send_msgs_history(checker_messages)
+        result = llamainteraction.send_msgs_history(checker_messages, user_id=user_id)
         checker_messages.append({"role": "assistant", "content": result})
-
+        print(result)
         try:
             result_json = json.loads(result)
             function_name = result_json.get("function_name")
@@ -114,7 +91,8 @@ def create_question(prompt, previous_question=None, status=None):
                     checker_messages.append({"role": "functions", "content": "Error: Correct answer parameter is missing"})
                     continue
 
-                submit_function(work, correctanswer)
+                correctanswer = correctanswer
+                work = work
                 break
 
             elif function_name == "python_eval":
@@ -137,18 +115,11 @@ def create_question(prompt, previous_question=None, status=None):
         except KeyError:
             checker_messages.append({"role": "functions", "content": "Error: Function name is missing"})
     
-    result = gpt_interaction.run_query(gpt_model="gpt-4o", system_text=checker_system_text, messages=checker_messages, user_prompt="Great! Now, do the calculations and give me an answer", functions=[checker_function, submit_function], returnmessages=False)
-    work = workg
-    correctanswer = correctanswerg
     print(work)
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(llamainteraction.sendmsgs,correctgpt_system_text, f"question: {question}\nanswer1: {answer}\nanswer2: {correctanswer}")]
-    for future in concurrent.futures.as_completed(futures):
-        correctness = future.result()
-    print(correctness)
+    correctness = llamainteraction.sendmsgs(correctgpt_system_text, f"question: {question}\nanswer1: {answer}\nanswer2: {correctanswer}", user_id = user_id)
     correctness = "Correct!" if "correct" in correctness.lower() else ("Incorrect!" if "incorrect" in correctness.lower() else correctness)
-    with open("problem_result.json", "w") as file:
+    with open(f"{user_id}_problem_result.json", "w") as file:
         json.dump(
             {"result":correctness, "work":work},
             file, indent = 4)
-        answered = True
+        user_answered[user_id] = True

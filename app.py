@@ -4,11 +4,12 @@ import json
 import threading
 import logging
 import time
+import os
 log = logging.getLogger('werkzeug')
 log.disabled = True
 app = Flask(__name__)
 
-currentslide = 0
+user_states = {}
 
 @app.route('/')
 def index():
@@ -16,112 +17,116 @@ def index():
 
 @app.route("/api", methods=["POST"])
 def create_test():
-    global currentslide
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     subject = data['subject']
-    print("Hjere")
-    currentslide=1
-    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.")
-    return jsonify({'message':'Recieved well'}), 200
+    user_id = data['user_id']
+    user_states[user_id] = {"currentslide": 1, "answered": False}
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", user_id=user_id)
+    return jsonify({'message':'Received well'}), 200
 
 @app.route('/question.txt', methods=['GET'])
 def get_question():
-    with open('question.txt', 'r') as txt:
+    user_id = request.args.get('user_id')
+    with open(f'{user_id}_question.txt', 'r') as txt:
         content = txt.read()
     return content, 200
 
 @app.route("/answer", methods=['POST'])
 def answer_question():
-    global currentslide
-    currentslide = 3
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     answer = data['answer']
-    problem_generation.answer = answer
+    user_id = data['user_id']
+    user_states[user_id]['currentslide'] = 3
+    problem_generation.set_answer(user_id, answer)
     return jsonify({'message':'Answer posted'}), 200
 
 @app.route("/work.txt", methods=["GET"])
 def get_work():
-    if not problem_generation.answered:
+    user_id = request.args.get('user_id')
+    if not user_states[user_id]['answered']:
         return "document not created yet", 200
-    with open("problem_result.json", "r") as txt:
+    with open(f"{user_id}_problem_result.json", "r") as txt:
         data = json.load(txt)
         return data["work"], 200
 
 @app.route('/correct.txt')
 def get_correctness():
-    if not problem_generation.answered:
+    user_id = request.args.get('user_id')
+    if not user_states[user_id]['answered']:
         return jsonify({"error":"document not created yet"}), 200
-    with open("problem_result.json", "r") as txt:
+    with open(f"{user_id}_problem_result.json", "r") as txt:
         data = json.load(txt)
         return data["result"], 200
-    
+
 @app.route('/sametopic', methods=["POST"])
 def sametopic():
-    global currentslide
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     subject = data['subject']
     previous_question = data['previous_question']
-    currentslide=1
-    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "similar")
-    return jsonify({'message':'Recieved well'}), 200
+    user_id = data['user_id']
+    user_states[user_id]['currentslide'] = 1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "similar", user_id=user_id)
+    return jsonify({'message':'Received well'}), 200
 
 @app.route('/differenttopic', methods=["POST"])
 def differenttopic():
-    global currentslide
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     subject = data['subject']
     previous_question = data['previous_question']
-    currentslide=1
-    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "different")
-    return jsonify({'message':'Recieved well'}), 200    
+    user_id = data['user_id']
+    user_states[user_id]['currentslide'] = 1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "different", user_id=user_id)
+    return jsonify({'message':'Received well'}), 200    
 
 @app.route('/easyquestion', methods=["POST"])
 def easytopic():
-    global currentslide
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     subject = data['subject']
     previous_question = data['previous_question']
-    currentslide=1
-    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "easier")
-    return jsonify({'message':'Recieved well'}), 200   
+    user_id = data['user_id']
+    user_states[user_id]['currentslide'] = 1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "easier", user_id=user_id)
+    return jsonify({'message':'Received well'}), 200   
 
 @app.route('/hardquestion', methods=["POST"])
 def hardtopic():
-    global currentslide
     data = request.get_json()
     if not data:
         return jsonify({"error":"Invalid input"}), 400
     subject = data['subject']
     previous_question = data['previous_question']
-    currentslide=1
-    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "harder")
-    return jsonify({'message':'Recieved well'}), 200   
+    user_id = data['user_id']
+    user_states[user_id]['currentslide'] = 1
+    problem_generation.create_question(f"Write a problem for {subject}. Do not include the solution, or any methods. Make sure that this question is at an appropriate difficulty for an {subject} student.", previous_question, "harder", user_id=user_id)
+    return jsonify({'message':'Received well'}), 200   
 
 @app.route("/frame.txt", methods=["POST"])
 def returnframe():
-    global currentslide
-    return str(currentslide), 200
+    user_id = request.args.get('user_id')
+    return str(user_states[user_id]['currentslide']), 200
 
 def moveonfromloading():
-    global currentslide
     while True:
-        if currentslide == 1 and problem_generation.questiong:
-            currentslide = 2
-        if currentslide == 3 and problem_generation.answered:
-            currentslide = 4
+        for user_id, state in user_states.items():
+            if state['currentslide'] == 1:
+                if os.path.exists(f"{user_id}_question.txt"):
+                    with open(f"{user_id}_question.txt", "r") as txt:
+                        if txt.read() != "":
+                            state['currentslide'] = 2
+            if state['currentslide'] == 3 and state['answered']:
+                state['currentslide'] = 4
         time.sleep(0.1)
 
 if __name__ == "__main__":
     threading.Thread(target=moveonfromloading, daemon=True).start()
     app.run(debug=False, port=8080)
-    
