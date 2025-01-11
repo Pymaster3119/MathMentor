@@ -1,1 +1,0 @@
-Find the derivative of the function f(x) = (2x^3 + 5x^2 - 3x + 1) / (x^2 + 4x + 5) using the quotient rule.

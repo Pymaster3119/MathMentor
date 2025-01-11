@@ -198,3 +198,12 @@ document.getElementById("easyButton").addEventListener("click", () => {
     .then(response => {
     });
 });
+
+function deleteUser() {
+    const data = JSON.stringify({user_id: userHash});
+    navigator.sendBeacon("/delete", data);
+}
+
+window.addEventListener('unload', function (event) {
+    deleteUser();
+});

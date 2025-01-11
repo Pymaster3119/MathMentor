@@ -1,6 +1,0 @@
-Find the equation of the curve that passes through the points (0, 1) and (2π, 0) and has the following properties:
-
-- It is a periodic function with period 2π.
-- The function is continuous and differentiable on its entire domain.
-- The function is symmetric about the x-axis.
-- The function's derivative is given by f'(x) = -sin(x) + 2.

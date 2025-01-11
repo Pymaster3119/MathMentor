@@ -115,6 +115,24 @@ def returnframe():
     user_id = request.args.get('user_id')
     return str(user_states[user_id]['currentslide']), 200
 
+@app.route("/delete", methods=["POST"])
+def deleteuser():
+    data = request.get_json()
+    user_id = data.get("user_id")
+    if user_id in user_states:
+        del user_states[user_id]
+    if user_id in problem_generation.user_answers:
+        del problem_generation.user_answers[user_id]
+    if user_id in problem_generation.user_answered:
+        del problem_generation.user_answered[user_id]
+    if os.path.exists(f"{user_id}_question.txt"):
+        os.remove(f"{user_id}_question.txt")
+    if os.path.exists(f"{user_id}_problem_result.json"):
+        os.remove(f"{user_id}_problem_result.json")
+    if os.path.exists(f"LLamaInteraction/LLMInput_{user_id}"):
+        os.rmdir(f"LLamaInteraction/LLMInput_{user_id}")
+    return "Deleted", 200
+
 def moveonfromloading():
     while True:
         for user_id, state in user_states.items():
